@@ -240,6 +240,20 @@ void QMLBridge::setUSBDir(QString dir)
     emit usbDirChanged();
 }
 
+bool QMLBridge::getQwerty()
+{
+    return settings.value(QStringLiteral("qwertyKeypad"), false).toBool();
+}
+
+void QMLBridge::setQwerty(bool e)
+{
+    if(getQwerty() == e)
+        return;
+
+    settings.setValue(QStringLiteral("qwertyKeypad"), e);
+    emit qwertyChanged();
+}
+
 bool QMLBridge::getIsRunning()
 {
     return emu_thread.isRunning();

@@ -27,6 +27,7 @@ public:
     Q_PROPERTY(QString usbdir READ getUSBDir WRITE setUSBDir NOTIFY usbDirChanged)
     Q_PROPERTY(QString version READ getVersion CONSTANT)
     Q_PROPERTY(bool isRunning READ getIsRunning NOTIFY isRunningChanged)
+    Q_PROPERTY(bool qwerty READ getQwerty WRITE setQwerty NOTIFY qwertyChanged)
     Q_PROPERTY(KitModel* kits READ getKitModel CONSTANT)
 
     Q_PROPERTY(double speed READ getSpeed NOTIFY speedChanged)
@@ -63,6 +64,9 @@ public:
     void setUSBDir(QString dir);
     bool getIsRunning();
     QString getVersion();
+
+    bool getQwerty();
+    void setQwerty(bool e);
 
     double getSpeed();
     bool getTurboMode();
@@ -150,6 +154,7 @@ signals:
     void suspendOnCloseChanged();
     void usbDirChanged();
     void isRunningChanged();
+    void qwertyChanged();
     void speedChanged();
     void turboModeChanged();
 

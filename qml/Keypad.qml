@@ -9,6 +9,32 @@ Rectangle {
     height: 340
     color: "#444"
 
+    property var abcRow1: [
+        {text: "A", id: 50}, {text: "B", id: 49}, {text: "C", id: 48}, {text: "D", id: 46}, {text: "E", id: 45}, {text: "F", id: 44}, {text: "G", id: 39}
+    ]
+    property var abcRow2: [
+        {text: "H", id: 38}, {text: "I", id: 37}, {text: "J", id: 35}, {text: "K", id: 34}, {text: "L", id: 33}, {text: "M", id: 28}, {text: "N", id: 27}
+    ]
+    property var abcRow3: [
+        {text: "O", id: 26}, {text: "P", id: 24}, {text: "Q", id: 23}, {text: "R", id: 22}, {text: "S", id: 17}, {text: "T", id: 16}, {text: "U", id: 15}
+    ]
+    property var abcRow4: [
+        {text: "V", id: 13}, {text: "W", id: 12}, {text: "X", id: 11}, {text: "Y", id: 6}, {text: "Z", id: 5}
+    ]
+
+    property var qwertyRow1: [
+        {text: "Q", id: 23}, {text: "W", id: 12}, {text: "E", id: 45}, {text: "R", id: 22}, {text: "T", id: 16}, {text: "Y", id: 6}, {text: "U", id: 15}
+    ]
+    property var qwertyRow2: [
+        {text: "I", id: 37}, {text: "O", id: 26}, {text: "P", id: 24}, {text: "A", id: 50}, {text: "S", id: 17}, {text: "D", id: 46}, {text: "F", id: 44}
+    ]
+    property var qwertyRow3: [
+        {text: "G", id: 39}, {text: "H", id: 38}, {text: "J", id: 35}, {text: "K", id: 34}, {text: "L", id: 33}, {text: "Z", id: 5}, {text: "X", id: 11}
+    ]
+    property var qwertyRow4: [
+        {text: "C", id: 48}, {text: "V", id: 13}, {text: "B", id: 49}, {text: "N", id: 27}, {text: "M", id: 28}
+    ]
+
     ColumnLayout {
         id: columnLayout1
         width: 33
@@ -379,22 +405,17 @@ Rectangle {
         columns: 9
 
         NAlphaButton { width: 21; text: "EE" ;keymap_id: 30 }
-        NAlphaButton { text: "A" ;keymap_id: 50 }
-        NAlphaButton { text: "B" ;keymap_id: 49 }
-        NAlphaButton { text: "C" ;keymap_id: 48 }
-        NAlphaButton { text: "D" ;keymap_id: 46 }
-        NAlphaButton { text: "E" ;keymap_id: 45 }
-        NAlphaButton { text: "F" ;keymap_id: 44 }
-        NAlphaButton { text: "G" ;keymap_id: 39 }
+        Repeater {
+            model: Emu.qwerty ? qwertyRow1 : abcRow1
+            NAlphaButton { text: modelData.text; keymap_id: modelData.id }
+        }
         NAlphaButton { width: 21; text: "?!▸";keymap_id: 8 }
+
         NAlphaButton { width: 21; text: "π▸";keymap_id: 19 }
-        NAlphaButton { text: "H" ;keymap_id: 38 }
-        NAlphaButton { text: "I" ;keymap_id: 37 }
-        NAlphaButton { text: "J" ;keymap_id: 35 }
-        NAlphaButton { text: "K" ;keymap_id: 34 }
-        NAlphaButton { text: "L" ;keymap_id: 33 }
-        NAlphaButton { text: "M" ;keymap_id: 28 }
-        NAlphaButton { text: "N" ;keymap_id: 27 }
+        Repeater {
+            model: Emu.qwerty ? qwertyRow2 : abcRow2
+            NAlphaButton { text: modelData.text; keymap_id: modelData.id }
+        }
         NAlphaButton { width: 21; text: "";keymap_id: 66;
             Image {
                 source: "qrc:/keyimages/resources/keyimages/flag.png"
@@ -404,25 +425,23 @@ Rectangle {
                 mipmap: true
             }
         }
+
         NAlphaButton { width: 21; text: "," ;keymap_id: 87 }
-        NAlphaButton { text: "O" ;keymap_id: 26 }
-        NAlphaButton { text: "P" ;keymap_id: 24 }
-        NAlphaButton { text: "Q" ;keymap_id: 23 }
-        NAlphaButton { text: "R" ;keymap_id: 22 }
-        NAlphaButton { text: "S" ;keymap_id: 17 }
-        NAlphaButton { id: nAlphaButtonT; text: "T" ;keymap_id: 16 }
-        NAlphaButton { id: nAlphaButtonU; text: "U" ;keymap_id: 15 }
+        Repeater {
+            model: Emu.qwerty ? qwertyRow3 : abcRow3
+            NAlphaButton { text: modelData.text; keymap_id: modelData.id }
+        }
         NAlphaButton { width: 21; text: "↵";keymap_id: 0 }
+
         Rectangle {
             color: "#00000000"
             width: 15
             height: 15
         }
-        NAlphaButton { text: "V" ;keymap_id: 13 }
-        NAlphaButton { text: "W" ;keymap_id: 12 }
-        NAlphaButton { text: "X" ;keymap_id: 11 }
-        NAlphaButton { text: "Y" ;keymap_id: 6 }
-        NAlphaButton { text: "Z" ;keymap_id: 5 }
+        Repeater {
+            model: Emu.qwerty ? qwertyRow4 : abcRow4
+            NAlphaButton { text: modelData.text; keymap_id: modelData.id }
+        }
 
         NAlphaButton {
             text: "space"

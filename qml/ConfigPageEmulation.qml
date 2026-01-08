@@ -114,6 +114,17 @@ ColumnLayout {
         }
     }
 
+    CheckBox {
+        text: qsTr("QWERTY Keypad")
+
+        checked: Emu.qwerty
+        visible: Emu.isMobile()
+        onCheckedChanged: {
+            Emu.qwerty = checked;
+            checked = Qt.binding(function() { return Emu.qwerty; });
+        }
+    }
+
     Item {
         Layout.fillHeight: true
     }
