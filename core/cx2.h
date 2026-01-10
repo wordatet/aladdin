@@ -10,10 +10,11 @@ extern "C" {
 typedef struct emu_snapshot emu_snapshot;
 
 typedef struct aladdin_pmu_state {
-  uint32_t clocks;
-  uint32_t disable[3];
-  uint32_t int_state; // Actual bit assignments not known
-  uint32_t noidea[0x100 / sizeof(uint32_t)];
+  uint32_t pdllcr0;         // 0x30, was clocks
+  uint32_t pmsr;            // 0x20, was disable[0]
+  uint32_t pgsr;            // 0x24, was int_state
+  uint32_t pspr[16];        // 0x50-0x8C, scratchpads/status
+  uint32_t regs[0x100 / 4]; // Generic access for other registers
 } aladdin_pmu_state;
 
 void aladdin_pmu_write(uint32_t addr, uint32_t value);

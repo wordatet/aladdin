@@ -13,15 +13,13 @@ struct aladdin_pmu_state aladdin_pmu;
 
 void aladdin_pmu_reset(void) {
   memset(&aladdin_pmu, 0, sizeof(aladdin_pmu));
-  aladdin_pmu.clocks = 0x21020303;
-  aladdin_pmu.disable[0] = 0;
-  aladdin_pmu.noidea[0] = 0x1A;
-  aladdin_pmu.noidea[1] = 0x101;
-  // Special cases for 0x808-0x810, see aladdin_pmu_read
-  // aladdin_pmu.noidea[4] = 0x111;
-  aladdin_pmu.noidea[5] = 0x1;
-  aladdin_pmu.noidea[6] = 0x100;
-  aladdin_pmu.noidea[7] = 0x10;
+  aladdin_pmu.pdllcr0 = 0x21020303;     // Correct for PDLLCR0
+  aladdin_pmu.regs[0x08 >> 2] = 0x2000; // OSCC
+  aladdin_pmu.regs[0x28 >> 2] = 0x1A;   // MFPSR
+  aladdin_pmu.regs[0x2C >> 2] = 0x101;  // MISC
+  aladdin_pmu.pspr[5] = 0x1;
+  aladdin_pmu.pspr[6] = 0x100;
+  aladdin_pmu.pspr[7] = 0x10;
 
   uint32_t cpu = 396000000;
   sched.clock_rates[CLOCK_CPU] = cpu;
@@ -30,7 +28,7 @@ void aladdin_pmu_reset(void) {
 }
 
 static void aladdin_pmu_update_int() {
-  int_set(INT_POWER, aladdin_pmu.int_state != 0);
+  int_set(INT_POWER, aladdin_pmu.pgsr != 0);
 }
 
 uint32_t aladdin_pmu_read(uint32_t addr) {
@@ -44,15 +42,15 @@ uint32_t aladdin_pmu_read(uint32_t addr) {
     case 0x08:
       return 0x2000;
     case 0x20:
-      return aladdin_pmu.disable[0];
+      return aladdin_pmu.pmsr;
     case 0x24:
-      return aladdin_pmu.int_state;
+      return aladdin_pmu.pgsr;
     case 0x30:
-      return aladdin_pmu.clocks;
+      return aladdin_pmu.pdllcr0;
     case 0x50:
-      return aladdin_pmu.disable[1];
+      return aladdin_pmu.pspr[0];
     case 0x60:
-      return aladdin_pmu.disable[2];
+      return aladdin_pmu.pspr[4];
     }
   } else if (offset == 0x808) // efuse
     return 0x0021DB19;      // TODO: Taken from CX II CAS, same on other models?
@@ -62,7 +60,9 @@ uint32_t aladdin_pmu_read(uint32_t addr) {
     /* Bit 8 clear when ON key pressed */
     return 0x11 | ((keypad.key_map[0] & 1 << 9) ? 0 : 0x100);
   else if (offset >= 0x800 && offset < 0x900)
-    return aladdin_pmu.noidea[(offset & 0xFF) >> 2];
+    return aladdin_pmu.regs[(offset & 0xFF) >> 2];
+  else if (offset >= 0x050 && offset < 0x090)
+    return aladdin_pmu.pspr[(offset - 0x50) >> 2];
 
   return bad_read_word(addr);
 }
@@ -84,23 +84,23 @@ void aladdin_pmu_write(uint32_t addr, uint32_t value) {
         // Without this, the clocks are wrong
         aladdin_pmu_reset();
       } else
-        aladdin_pmu.disable[0] = value;
+        aladdin_pmu.pmsr = value;
 
       return;
     case 0x24:
-      aladdin_pmu.int_state &= ~value;
+      aladdin_pmu.pgsr &= ~value;
       aladdin_pmu_update_int();
       return;
     case 0x30:
-      aladdin_pmu.clocks = value;
-      aladdin_pmu.int_state |= 1;
+      aladdin_pmu.pdllcr0 = value;
+      aladdin_pmu.pgsr |= 1;
       aladdin_pmu_update_int();
       return;
     case 0x50:
-      aladdin_pmu.disable[1] = value;
+      aladdin_pmu.pspr[0] = value;
       return;
     case 0x60:
-      aladdin_pmu.disable[2] = value;
+      aladdin_pmu.pspr[4] = value;
       return;
     case 0xC4:
       return;
@@ -108,7 +108,10 @@ void aladdin_pmu_write(uint32_t addr, uint32_t value) {
   } else if (offset == 0x80C || offset == 0x810)
     return bad_write_word(addr, value);
   else if (offset >= 0x800 && offset < 0x900) {
-    aladdin_pmu.noidea[(offset & 0xFF) >> 2] = value;
+    aladdin_pmu.regs[(offset & 0xFF) >> 2] = value;
+    return;
+  } else if (offset >= 0x050 && offset < 0x090) {
+    aladdin_pmu.pspr[(offset - 0x50) >> 2] = value;
     return;
   }
 
