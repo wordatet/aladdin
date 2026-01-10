@@ -654,6 +654,7 @@ void QMLBridge::setUSBIPEnabled(bool e) {
     if (usblink_connected) {
       usblink_reset(); // Disconnect internal link to avoid conflict
     }
+    USBIPServer::instance().setVerbose(getUSBIPVerbose());
     USBIPServer::instance().start();
 
 #ifdef __linux__
@@ -662,6 +663,7 @@ void QMLBridge::setUSBIPEnabled(bool e) {
 #endif
   } else {
     USBIPServer::instance().stop();
+    USBIPServer::instance().setVerbose(false);
 
 #ifdef __linux__
     // Auto-detach in background
